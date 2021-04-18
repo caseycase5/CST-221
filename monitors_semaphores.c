@@ -36,7 +36,6 @@ void *chat(void* arg) {
     
     // Semaphore unlocking
     sem_post(&mutex);
-    sleep(5);
 }
 
 int main() {
@@ -48,7 +47,7 @@ int main() {
     u5 = 5;
     
     // Initializing the Semaphore
-    sem_init(&mutex, 0, 2);
+    sem_init(&mutex, 0, 1);
     
     // Creation of 5 Threads
     pthread_create(&user1, NULL, chat, (void *)&u1);
