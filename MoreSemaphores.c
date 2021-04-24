@@ -19,15 +19,15 @@ void signalHandler1(int signum) {
     _exit(0);
 }
 
-vid signalHandler2(int signum) {
+void signalHandler2(int signum) {
     printf("I am alive!\n");
 }
 
 // Child process code
 void childProcess() {
     // Signal Handlers
-    signal(SIGUSER1, signalHandler1);
-    signal(SIGUSER2, signalHandler2);
+    signal(SIGUSR1, signalHandler1);
+    signal(SIGUSR2, signalHandler2);
     
     int value;
     sem_getvalue(semaphore, &value);
@@ -70,7 +70,7 @@ void parentProcess() {
     // Detecting hung child and killing the process after set time
     sleep(2);
     if(getpgid(otherPid) >= 0) {
-        printf("Child Process is running.\n")
+        printf("Child Process is running.\n");
     }
     
     int value;
@@ -84,7 +84,7 @@ void parentProcess() {
         
         printf("Detected Child Process that is hung...\n");
         if(pthread_create(&tid1, NULL, checkHungChild, &status)) {
-            printf("Error creating timer thread."\n);
+            printf("Error creating timer thread.\n");
             _exit(1);
         }
         
@@ -129,5 +129,37 @@ void parentProcess() {
     _exit(0);
 }
 
-
-
+int main(int argc, char* argv[]) {
+    pid_t pid;
+    
+    // Creating a shared semaphore
+    semaphore = (sem_t*)mmap(0, sizeof(sem_t), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+    // Failing to create semaphore
+    if(sem_init(semaphore, 1, 1) != 0){
+        exit(EXIT_FAILURE);
+    }
+    
+    // Forking processes
+    pid = fork();
+    if(pid == -1) {
+        printf("Error forking.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    // Creating Parent and Child processes
+    if(pid == 0) {
+        printf("Started Child Process with Process ID: %d\n", getpid());
+        otherPid = getpid();
+        childProcess();
+    }
+    else {
+        printf("Started Parent Process with Process ID: %d\n", getpid());
+        otherPid = pid;
+        parentProcess();
+    }
+    
+    // Destroying semaphore
+    sem_destroy(semaphore);
+    
+    return(0);
+}
