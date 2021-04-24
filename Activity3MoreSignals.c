@@ -4,17 +4,15 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/mman.h>
-
-int main()
-{
-
-}
+#include <errno.h>
 
 // Buffer
 int MAX = 100;
 int WAKEUP = SIGUSR1;
 int SLEEP = SIGUSR2;
+
 pid_t otherPid;
+
 sigset_t sigSet;
 
 struct CIRCULAR_BUFFER {
@@ -22,7 +20,7 @@ struct CIRCULAR_BUFFER {
     int lower;
     int upper;
     int buffer[100];
-}
+};
 
 struct CIRCULAR_BUFFER *buffer = NULL;
 
@@ -73,24 +71,65 @@ void consumer() {
     sigaddset(&sigSet, WAKEUP);
     sigprocmask(SIG_BLOCK, &sigSet, NULL);
     
-    printf("Running child process...\n");
+    printf("Running Child Process...\n");
     
     // Reading all characters from buffer
     int character = 0;
     do {
         sleepAndWait();
         character = getValue();
-    }while(character != 0);
+    }
+    while(character != 0);
     
-    printf("Exiting child process.\n");
+    printf("Exiting Child Process.\n");
     _exit(1);
 }
 
 void producer() {
+    int value = 0;
+    printf("Running the Parent Process...\n");
     
+    char message[10] = "Casey Huz";
+    for(int i = 0; i < 10; ++i) {
+        // Puts the values of the string into the buffer
+        putValue(message[i]);
+        wakeUp();
+        sleep(1);
+    }
+    // Tells child process that the parent has completed
+    putValue(0);
+    wakeUp();
+    
+    printf("Exiting the Parent Process.\n");
+    _exit(1);
 }
 
-
-
-
-
+int main(int argc, char* argv[]) {
+    pid_t pid;
+    
+    // Create the Buffer
+    buffer = (struct CIRCULAR_BUFFER*)mmap(0, sizeof(buffer), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+    buffer->count = 0;
+    buffer->lower = 0;
+    buffer->upper = 0;
+    
+    pid = fork();
+    
+    // Printing an error if PID = -1
+    if(pid == -1) {
+        printf("Error forking.");
+        exit(EXIT_FAILURE);
+    }
+    
+    // Executing Child Process
+    if(pid==0) {
+        otherPid = pid;
+        producer();
+    }
+    // Executing Parent Process
+    else {
+        otherPid = pid;
+        consumer();
+    }
+    return 0;
+}
