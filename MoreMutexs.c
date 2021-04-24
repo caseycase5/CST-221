@@ -5,7 +5,7 @@
 #include <errno.h>
 
 pthread_mutex_t mutex;
-int counter;
+int count;
 time_t endTime;
 
 void *counter(void *arg) {
@@ -17,15 +17,15 @@ void *counter(void *arg) {
         if(status == 0) {
             printf("Counter Thread: Locked Mutex.\n");
         }
-        ++counter;
+        ++count;
         status = pthread_mutex_unlock(&mutex);
         // Unlocking mutex
         if(status == 0) {
-            printf("Counter Thread: Unlocked Mutex");
+            printf("Counter Thread: Unlocked Mutex\n");
         }
         sleep(1);
     }
-    printf("Final Count: %d\n", counter);
+    printf("Final Count: %d\n", count);
     return NULL;
 }
 
@@ -41,7 +41,7 @@ void *monitor(void *arg) {
         
         if(status != EBUSY) {
             printf("Monitor Thread: Lock the mutex so we can read the counter.\n");
-            printf("Monitor Thread: The Count from the Counter Thread is: %d\n", counter);
+            printf("Monitor Thread: The Count from the Counter Thread is: %d\n", count);
             // Unlocking the mutex so the counter can gain access
             status = pthread_mutex_unlock(&mutex);
             if(status == 0) {
@@ -57,5 +57,33 @@ void *monitor(void *arg) {
     // Print the number of misses
     printf("Final number of Monitor Thread Misses: %d\n", misses);
     return NULL;
+}
+
+int main(int argc, char *argv[]) {
+    int status;
+    pthread_t counterThreadId;
+    pthread_t monitorThreadId;
+    
+    // Initialize the mutex
+    pthread_mutex_init(&mutex, 0);
+    
+    // Setting the time to 60 seconds
+    endTime = time(NULL) + 60;
+    
+    // Creating the threads
+    if(pthread_create(&counterThreadId, NULL, counter, NULL)) {
+        printf("Error creating counter thread.\n");
+    }
+    if(pthread_create(&monitorThreadId, NULL, monitor, NULL)) {
+        printf("Error creating monitor thread.\n");
+    }
+    
+    // Telling the system to wait for the threads to finish
+    if(pthread_join(counterThreadId, NULL)) {
+        printf("Error joining counter thread.");
+    }
+    if(pthread_join(monitorThreadId, NULL)) {
+        printf("Error joining monitor thread.");
+    }
     
 }
