@@ -37,7 +37,23 @@ int main(int argc, const char *argv[]) {
     // Converting the number to binary and printing it out
     printf("The number in binary is: ");
     convertPrintBinary(number, &bits[0]);
+    // Printing the number in hexadecimal (0x indicates hex number)
+    printf("The number in hexadecimal is: 0x%08X\n", number);
+    
+    // Shifting the number 10 bits to the left
+    // Masks the binary (11111111111111111111110000000000)
+    // Masks the number (0x03FF)
+    int shifted = ((number << 10) & 0xFFFFFC00 | 0x03FF);
+    
+    // Printing the shifted number
+    printf("The shifted number in decimal is: %d\n", shifted);
+    printf("The shifted number in hexadecimal is: 0x%08X\n", shifted);
+    printf("The shifted number in binary is: ");
+    convertPrintBinary(shifted, &bits[0]);
+    
+    return 0;
 }
+
 
 // Executing all functions (clear, conversion, and print)
 void convertPrintBinary(int number, char* bits) {
