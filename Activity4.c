@@ -1,4 +1,10 @@
 #include <stdio.h>
+#include <stdbool.h>
+void convertPrintBinary(int number, char* bits);
+void decimalToBinary(int number, char* bits);
+void clearBinary(char* bits);
+void printBinary(char* bits);
+
 
 int main(int argc, const char *argv[]) {
     // Storage for user entered number
@@ -25,8 +31,40 @@ int main(int argc, const char *argv[]) {
             valid = true;
         }
     }
-    
+    // Printing the number entered
     printf("The number entered is: %d\n", number);
-    
+    // Converting the number to binary and printing it out
+    printf("The number in binary is: ");
+    convertPrintBinary(number, &bits[0]);
     
 }
+
+void convertPrintBinary(int number, char* bits) {
+    clearBinary(&bits[0]);
+    decimalToBinary(number, &bits[0]);
+    printBinary(&bits[0]);
+}
+
+
+// Method for printing the binary number
+void printBinary(char* bits) {
+    for(int i = 31; i >= 0; i--){
+        printf("%c", bits[i]);
+    }
+    printf("\n");
+}
+
+// Method for converting to binary
+void decimalToBinary(int number, char* bits) {
+    for(int i = 0; number > 0; i++) {
+        bits[i] = number % 2;
+        number = number / 2;
+    }
+}
+
+// Method for clearing the binary array 
+void clearBinary(char* bits) {
+    decimalToBinary(0, &bits[0]);
+}
+
+
