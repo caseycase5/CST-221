@@ -22,3 +22,25 @@ mkdir mycode2
 cp -a /mycode /mycode2
 mv mycode deadcode
 rm -r deadcode
+
+#Simple Text File Viewing
+pwd
+cd /home
+pwd
+ls
+ls -a
+ls -l
+cd /mycode2
+less main.sql
+less -b main.sql
+less -h main.sql
+less -j main.sql
+
+more main.sql
+more -d main.sql
+more -f main.sql
+more -p main.sql
+
+file /home/*
+file /bin/*
+color 3
