@@ -58,6 +58,7 @@ echo "Quoted Values: $@"
 echo "Quoted Values: $*"
 echo "Total Number of Parameters: $#"
 
-#Permissions
+#If/Loop/Reading Files
+
 
 
