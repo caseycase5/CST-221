@@ -43,4 +43,21 @@ more -p main.sql
 
 file /home/*
 file /bin/*
-color 3
+
+#Misc. Commands
+name="Casey"
+age=25
+
+echo $name
+echo $age
+
+echo "File Name: $0"
+echo "First Parameter: $1"
+echo "Second Parameter: $2"
+echo "Quoted Values: $@"
+echo "Quoted Values: $*"
+echo "Total Number of Parameters: $#"
+
+#Permissions
+
+
